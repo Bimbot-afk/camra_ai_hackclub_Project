@@ -1,10 +1,11 @@
-import imutils
+#Just works if the background is really different to the objects to count, if u get troubles with false positive try changes values on line 12 ;)
+
 import cv2
 import imutils
 import numpy as np
 
-imagen_o=cv2.imread('moneda.jpg')
-imagen=cv2.imread('moneda.jpg', 0)
+imagen_o=cv2.imread('moneda.jpg') #name of ur image here :D
+imagen=cv2.imread('moneda.jpg', 0) #name of ur image here :D
 imagen=imutils.resize(imagen, width=1000)
 imagen_o=imutils.resize(imagen_o, width=1000)
 
