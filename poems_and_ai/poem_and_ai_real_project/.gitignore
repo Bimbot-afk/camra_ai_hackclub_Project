@@ -1,0 +1,14 @@
+# Cache de Python y entornos locales
+__pycache__/
+*.pyc
+.env/
+env/
+
+# Secretos e infraestructura de Streamlit (CRÍTICO)
+.streamlit/
+.env
+
+# Archivos pesados de YOLO y logs locales
+runs/
+*.pt
+*.txt
