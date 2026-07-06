@@ -67,6 +67,21 @@ if not os.path.exists(folder):
     os.mkdir(folder)
 
 st.markdown("*Por favor sube tu imagen con los objetos sobre los que quieres que trate el poema*")
+
+with st.expander("🔍 Ver objetos que el modelo puede detectar"):
+    st.markdown("""
+    El modelo está entrenado para reconocer los siguientes objetos:
+    * Gorra (`cap`)
+    * Carro Colombiano (`colombian_car`)
+    * Mono Grande (`monkey_big`)
+    * Mono Pequeño (`monkey_small`)
+    * Lata de Monster (`monster_can`)
+    * Otra Lata (`not_monster_can`)
+    * Lápiz (`pencil`)
+    * Control de PS5 (`ps5_contorller`)
+    * Oso de Peluche (`teddy_bear`)
+    """)
+
 st.divider()
 
 # Usage limit warning
@@ -141,19 +156,50 @@ if image_uploaded is not None:
             objects_str = str(objects)
 
         prompt_text = f"""
-        [ROLE AND STYLE]
-        Actúa como un escritor experto en literatura. Escribe un poema con un estilo "{style}" del autor "{autor}". 
-        El poema debe capturar la atmósfera, el tono y la esencia característica de este autor.
+[ROLE]
 
-        [INPUT DATA]
-        Debes incluir e integrar de forma fluida los siguientes elementos detectados en la escena:
-        {objects_str}
+You are an award-winning poet.
 
-        [CONSTRAINTS]
-        1. OUTPUT LANGUAGE: Escribe el poema única y exclusivamente en IDIOMA INGLÉS.
-        2. LENGTH: El largo del poema debe ser "{style_length}" (Máximo 500 palabras).
-        3. FORMAT: Entrega el poema directamente. Está ESTRICTAMENTE PROHIBIDO incluir introducciones, saludos, comentarios aclaratorios o conclusiones (ej. No escribas "Here is your poem:"). Inicia inmediatamente con el primer verso.
-        """
+Write a poem in the style of "{style}", strongly inspired by the literary voice of "{autor}".
+Capture the author's rhythm, imagery, emotional depth and worldview without quoting or copying their original works.
+
+[SCENE]
+
+The following objects are ALL present in front of the observer.
+
+{objects_str}
+
+These objects are NOT decorations.
+They ARE the source of the poem.
+
+Imagine they exist together in the same physical place.
+Discover relationships between them.
+Give symbolic meaning to them.
+Allow them to shape the emotion, narrative and imagery.
+
+If the detected objects are playful, the poem should naturally become playful.
+If they are lonely, the poem should become melancholic.
+If they create contrast, build the poem around that contrast.
+
+The poem should feel impossible to write if these specific objects were replaced with different ones.
+
+Do not simply list the objects.
+Instead, transform them into metaphors, symbols, memories or characters.
+
+Every detected object must influence at least one image or idea.
+
+[OUTPUT]
+
+Language: English only.
+
+Length: {style_length}
+
+Maximum 500 words.
+
+Output ONLY the poem.
+
+Begin immediately with the first line.
+"""
 
         with st.spinner("Pensando el poema..."):
             try:
