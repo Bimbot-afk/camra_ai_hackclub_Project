@@ -163,7 +163,7 @@ if image_uploaded is not None:
                     "Content-Type": "application/json"
                 }
                 payload = {
-                    "model": "meta-llama/meta-llama-3.1-8b-instruct",
+                    "model": "poolside/laguna-xs.2:free",
                     "messages": [
                         {
                             "role": "user",
