@@ -4,8 +4,7 @@ from collections import Counter
 import cv2
 import numpy as np 
 from ultralytics import YOLO
-from google import genai
-from google.genai import types
+import requests
 import os
 
 st.title("Generador de Poemas AI ✍️")
@@ -35,12 +34,8 @@ if not modelo:
 
 my_slack = "https://hackclub.enterprise.slack.com/archives/D0ATFQU6B7C"
 
-# Safe access to secrets
-try:
-    client = genai.Client(api_key=st.secrets["GEMINI_API_KEY"])
-except Exception:
-    st.error("No se encontró la GEMINI_API_KEY en los secretos. Configúrala en .streamlit/secrets.toml")
-    st.stop()
+st.markdown("Consigue tu API Key en: [https://ai.hackclub.com/dashboard](https://ai.hackclub.com/dashboard)")
+user_api_key = st.text_input("Ingresa tu Hack Club AI API Key:", type="password")
 
 folder = "My poems"
 
@@ -77,6 +72,9 @@ st.divider()
 # Usage limit warning
 uses_left = MAX_USES - st.session_state.generations_count
 st.info(f"Tienes {uses_left} generaciones de poemas disponibles en esta sesión.")
+
+if not user_api_key:
+    st.warning("⚠️ Ingresa tu API Key arriba para poder generar poemas.")
 
 image_uploaded=st.file_uploader("import poem image here :D", type=["jpg", "png", "jpeg"])
 
@@ -116,25 +114,25 @@ if image_uploaded is not None:
     st.divider()
     st.subheader("Your Poem")
 
-    # Disable button if limit reached
-    button_disabled = st.session_state.generations_count >= MAX_USES
+    # Disable button if limit reached or API key missing
+    button_disabled = st.session_state.generations_count >= MAX_USES or not user_api_key
 
     if st.button("Generate Poem", disabled=button_disabled):
         
         st.session_state.generations_count += 1
 
-        if style =="67, no cap, skibidi, sigma, pookie":
+        if style =="67, no cap, skibidi, sigma, pookie (brainrot)":
             style = "Use a super gen z terminology, based on tiktok/instagrams/reddit slag, ignore a lil bit the style of the author and focus on be hilarious, integrate the slang without sound forced"
 
         if length == "Small":
             style_length = "No more than 100 words"
-            config = types.GenerateContentConfig(max_output_tokens=500)
+            max_tokens = 500
         elif length == "Medium":
             style_length = "No more than 200 words"
-            config = types.GenerateContentConfig(max_output_tokens=1000)
+            max_tokens = 1000
         elif length == "Large (pay for the tokens >:c)":
             style_length = "No more than 300 words"
-            config = types.GenerateContentConfig(max_output_tokens=1500)
+            max_tokens = 1500
 
         # Fix empty objects bug from original code
         if not objects:
@@ -142,26 +140,45 @@ if image_uploaded is not None:
         else:
             objects_str = str(objects)
 
+        prompt_text = f"""
+        [ROLE AND STYLE]
+        Actúa como un escritor experto en literatura. Escribe un poema con un estilo "{style}" del autor "{autor}". 
+        El poema debe capturar la atmósfera, el tono y la esencia característica de este autor.
+
+        [INPUT DATA]
+        Debes incluir e integrar de forma fluida los siguientes elementos detectados en la escena:
+        {objects_str}
+
+        [CONSTRAINTS]
+        1. OUTPUT LANGUAGE: Escribe el poema única y exclusivamente en IDIOMA INGLÉS.
+        2. LENGTH: El largo del poema debe ser "{style_length}" (Máximo 500 palabras).
+        3. FORMAT: Entrega el poema directamente. Está ESTRICTAMENTE PROHIBIDO incluir introducciones, saludos, comentarios aclaratorios o conclusiones (ej. No escribas "Here is your poem:"). Inicia inmediatamente con el primer verso.
+        """
+
         with st.spinner("Pensando el poema..."):
             try:
-                response = client.models.generate_content(
-                config=config, 
-                model="gemini-2.5-flash-lite", 
-                contents=f"""
-                [ROLE AND STYLE]
-                Actúa como un escritor experto en literatura. Escribe un poema con un estilo "{style}" del autor "{autor}". 
-                El poema debe capturar la atmósfera, el tono y la esencia característica de este autor.
-
-                [INPUT DATA]
-                Debes incluir e integrar de forma fluida los siguientes elementos detectados en la escena:
-                {objects_str}
-
-                [CONSTRAINTS]
-                1. OUTPUT LANGUAGE: Escribe el poema única y exclusivamente en IDIOMA INGLÉS.
-                2. LENGTH: El largo del poema debe ser "{style_length}" (Máximo 500 palabras).
-                3. FORMAT: Entrega el poema directamente. Está ESTRICTAMENTE PROHIBIDO incluir introducciones, saludos, comentarios aclaratorios o conclusiones (ej. No escribas "Here is your poem:"). Inicia inmediatamente con el primer verso.
-                """)
-                st.session_state.poem = response.text
+                url = "https://ai.hackclub.com/proxy/v1/chat/completions"
+                headers = {
+                    "Authorization": f"Bearer {user_api_key}",
+                    "Content-Type": "application/json"
+                }
+                payload = {
+                    "model": "meta-llama/meta-llama-3.1-8b-instruct",
+                    "messages": [
+                        {
+                            "role": "user",
+                            "content": prompt_text
+                        }
+                    ],
+                    "max_tokens": max_tokens
+                }
+                
+                response = requests.post(url, headers=headers, json=payload)
+                if response.status_code == 200:
+                    st.session_state.poem = response.json()["choices"][0]["message"]["content"]
+                else:
+                    st.error(f"Error {response.status_code}: {response.text}")
+                    st.session_state.generations_count -= 1 # Revert count on error
             except Exception as e:
                 st.error(f"Error generando poema: {e}")
                 st.session_state.generations_count -= 1 # Revert count on error

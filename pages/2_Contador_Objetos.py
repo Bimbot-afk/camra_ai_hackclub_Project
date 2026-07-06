@@ -57,10 +57,10 @@ if uploaded_file is not None:
     
     with col1:
         st.subheader("Imagen Original Procesada")
-        st.image(image_o, channels="BGR", use_column_width=True)
+        st.image(image_o, channels="BGR", use_container_width=True)
         
     with col2:
         st.subheader("Máscara (Threshold)")
-        st.image(ther, cmap="gray", use_column_width=True)
+        st.image(ther, use_container_width=True)
         
     st.success(f"🎉 **¡Se encontraron {len(objetos_validos)} objetos!**")
