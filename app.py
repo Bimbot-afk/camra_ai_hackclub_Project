@@ -13,7 +13,7 @@ Bienvenido a la colección de proyectos de Inteligencia Artificial y Visión por
 Usa el menú lateral para navegar entre los diferentes mini proyectos y pruebas.
 
 ### Proyectos Principales
-* **Generador de Poemas (Gemini):** Analiza una imagen usando YOLO para detectar objetos, y genera un poema personalizado sobre ellos usando IA generativa.
+* **Generador de Poemas:** Analiza una imagen usando YOLO para detectar objetos, y genera un poema personalizado sobre ellos usando IA generativa.
 
 ### Mini Proyectos
 * **Contador de Objetos:** Sube una imagen (ej. monedas) y usa OpenCV para contar cuántos objetos hay mediante la detección de contornos.
