@@ -233,9 +233,14 @@ Begin immediately with the first line.
                 
                 # Check response format
                 if hasattr(response, 'choices') and len(response.choices) > 0:
-                    st.session_state.poem = response.choices[0].message.content
+                    contenido = response.choices[0].message.content
+                    if contenido:
+                        st.session_state.poem = contenido
+                    else:
+                        st.error(f"La IA respondió correctamente pero el contenido está vacío. Respuesta en bruto: {response}")
+                        st.session_state.generations_count -= 1
                 else:
-                    st.error("La API devolvió una respuesta vacía o con error.")
+                    st.error(f"La API devolvió una respuesta vacía o con error: {response}")
                     st.session_state.generations_count -= 1
             except Exception as e:
                 st.error(f"Error conectando con la IA (¿Se agotó el tiempo de espera?): {e}")
