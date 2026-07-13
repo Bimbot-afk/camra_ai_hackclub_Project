@@ -221,7 +221,7 @@ Begin immediately with the first line.
                 from openrouter import OpenRouter
                 client = OpenRouter(
                     api_key=user_api_key,
-                    server_url="https://ai.hackclub.com/proxy/v1"
+                    base_url="https://ai.hackclub.com/proxy/v1"
                 )
                 
                 response = client.chat.send(
