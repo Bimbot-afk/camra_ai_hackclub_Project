@@ -37,6 +37,15 @@ my_slack = "https://hackclub.enterprise.slack.com/archives/D0ATFQU6B7C"
 st.markdown("Consigue tu API Key en: [https://ai.hackclub.com/dashboard](https://ai.hackclub.com/dashboard)")
 user_api_key = st.text_input("Ingresa tu Hack Club AI API Key:", type="password")
 
+modelo_ai = st.selectbox("Selecciona el modelo AI:", [
+    "meta-llama/meta-llama-3.1-8b-instruct",
+    "meta-llama/llama-3.1-8b-instruct:free",
+    "google/gemini-2.5-flash",
+    "mistralai/mistral-nemo",
+    "poolside/laguna-xs.2:free",
+    "meta-llama/llama-3.3-70b-instruct"
+])
+
 folder = "My poems"
 
 @st.dialog("Guardar Poema", width="large")
@@ -209,7 +218,7 @@ Begin immediately with the first line.
                     "Content-Type": "application/json"
                 }
                 payload = {
-                    "model": "poolside/laguna-xs.2:free",
+                    "model": modelo_ai,
                     "messages": [
                         {
                             "role": "user",
