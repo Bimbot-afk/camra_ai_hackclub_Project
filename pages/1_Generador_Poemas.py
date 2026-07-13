@@ -38,18 +38,15 @@ st.markdown("Consigue tu API Key en: [https://ai.hackclub.com/dashboard](https:/
 user_api_key = st.text_input("Ingresa tu Hack Club AI API Key:", type="password")
 
 modelo_ai = st.selectbox("Selecciona el modelo AI:", [
-    "tencent/hy3:free",
-    "openai/gpt-5.6-luna",
-    "openai/gpt-5.6-luna-pro",
-    "openai/gpt-5.6-terra",
-    "openai/gpt-5.6-terra-pro",
-    "openai/gpt-5.6-sol",
-    "openai/gpt-5.6-sol-pro",
-    "x-ai/grok-4.5",
-    "~x-ai/grok-latest",
-    "aion-labs/aion-3.0-mini",
-    "aion-labs/aion-3.0",
-    "tencent/hy3"
+    "google/gemma-4-31b-it:free",
+    "google/gemma-4-26b-a4b-it:free",
+    "poolside/laguna-m.1:free",
+    "poolside/laguna-xs-2.1:free",
+    "nvidia/nemotron-3-super-120b-a12b:free",
+    "nvidia/nemotron-3-ultra-550b-a55b:free",
+    "nvidia/nemotron-3-nano-30b-a3b:free",
+    "cohere/north-mini-code:free",
+    "liquid/lfm-2.5-1.2b-instruct:free"
 ])
 
 folder = "My poems"
