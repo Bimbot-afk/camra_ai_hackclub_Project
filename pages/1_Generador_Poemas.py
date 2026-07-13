@@ -156,13 +156,13 @@ if image_uploaded is not None:
 
         if length == "Small":
             style_length = "No more than 100 words"
-            max_tokens = 500
+            max_tokens = 1500
         elif length == "Medium":
             style_length = "No more than 200 words"
-            max_tokens = 1000
+            max_tokens = 3000
         elif length == "Large (pay for the tokens >:c)":
             style_length = "No more than 300 words"
-            max_tokens = 1500
+            max_tokens = 5000
 
         # Fix empty objects bug from original code
         if not objects:
@@ -233,7 +233,13 @@ Begin immediately with the first line.
                 
                 # Check response format
                 if hasattr(response, 'choices') and len(response.choices) > 0:
-                    contenido = response.choices[0].message.content
+                    msg = response.choices[0].message
+                    contenido = msg.content
+                    
+                    # Some reasoning models put output in 'reasoning' and content is None if they run out of tokens
+                    if not contenido and hasattr(msg, 'reasoning') and msg.reasoning:
+                        contenido = f"*(El modelo gastó todos sus tokens pensando y no alcanzó a escribir el poema final. Aquí está su proceso de pensamiento:)*\n\n{msg.reasoning}"
+                        
                     if contenido:
                         st.session_state.poem = contenido
                     else:
