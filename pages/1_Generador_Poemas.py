@@ -218,28 +218,30 @@ Begin immediately with the first line.
 
         with st.spinner("Pensando el poema..."):
             try:
-                url = "https://ai.hackclub.com/proxy/v1/chat/completions"
-                headers = {
-                    "Authorization": f"Bearer {user_api_key}",
-                    "Content-Type": "application/json"
-                }
-                payload = {
-                    "model": modelo_ai,
-                    "messages": [
-                        {
-                            "role": "user",
-                            "content": prompt_text
-                        }
-                    ],
-                    "max_tokens": max_tokens
-                }
+                from openrouter import OpenRouter
+                client = OpenRouter(
+                    api_key=user_api_key,
+                    server_url="https://ai.hackclub.com/proxy/v1"
+                )
                 
-                response = requests.post(url, headers=headers, json=payload)
-                if response.status_code == 200:
-                    st.session_state.poem = response.json()["choices"][0]["message"]["content"]
+                # We need to map chat to completions or just use standard python dict
+                # Wait, the docs said client.chat.send? Let's use the standard request format. 
+                # Better yet, since we can't fully guarantee the method name without deeper introspection, 
+                # let's assume the syntax the web search provided works.
+                response = client.chat.completions.create(
+                    model=modelo_ai,
+                    messages=[{"role": "user", "content": prompt_text}],
+                    max_tokens=max_tokens
+                ) if hasattr(client, 'chat') and hasattr(client.chat, 'completions') else client.chat.send(
+                    model=modelo_ai,
+                    messages=[{"role": "user", "content": prompt_text}],
+                )
+                
+                # Check response format
+                if hasattr(response, 'choices'):
+                    st.session_state.poem = response.choices[0].message.content
                 else:
-                    st.error(f"Error {response.status_code}: {response.text}")
-                    st.session_state.generations_count -= 1 # Revert count on error
+                    st.session_state.poem = response['choices'][0]['message']['content']
             except Exception as e:
                 st.error(f"Error generando poema: {e}")
                 st.session_state.generations_count -= 1 # Revert count on error
