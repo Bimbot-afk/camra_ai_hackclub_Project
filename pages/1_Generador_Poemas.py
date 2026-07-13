@@ -224,26 +224,21 @@ Begin immediately with the first line.
                     server_url="https://ai.hackclub.com/proxy/v1"
                 )
                 
-                # We need to map chat to completions or just use standard python dict
-                # Wait, the docs said client.chat.send? Let's use the standard request format. 
-                # Better yet, since we can't fully guarantee the method name without deeper introspection, 
-                # let's assume the syntax the web search provided works.
-                response = client.chat.completions.create(
+                response = client.chat.send(
                     model=modelo_ai,
                     messages=[{"role": "user", "content": prompt_text}],
-                    max_tokens=max_tokens
-                ) if hasattr(client, 'chat') and hasattr(client.chat, 'completions') else client.chat.send(
-                    model=modelo_ai,
-                    messages=[{"role": "user", "content": prompt_text}],
+                    max_tokens=max_tokens,
+                    timeout_ms=25000  # 25 seconds timeout to prevent freezing
                 )
                 
                 # Check response format
-                if hasattr(response, 'choices'):
+                if hasattr(response, 'choices') and len(response.choices) > 0:
                     st.session_state.poem = response.choices[0].message.content
                 else:
-                    st.session_state.poem = response['choices'][0]['message']['content']
+                    st.error("La API devolvió una respuesta vacía o con error.")
+                    st.session_state.generations_count -= 1
             except Exception as e:
-                st.error(f"Error generando poema: {e}")
+                st.error(f"Error conectando con la IA (¿Se agotó el tiempo de espera?): {e}")
                 st.session_state.generations_count -= 1 # Revert count on error
 
     # Display the poem if it exists in session state
