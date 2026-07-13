@@ -218,17 +218,17 @@ Begin immediately with the first line.
 
         with st.spinner("Pensando el poema..."):
             try:
-                from openrouter import OpenRouter
-                client = OpenRouter(
+                from openai import OpenAI
+                client = OpenAI(
                     api_key=user_api_key,
-                    base_url="https://ai.hackclub.com/proxy/v1"
+                    base_url="https://ai.hackclub.com/proxy/v1",
+                    timeout=25.0
                 )
                 
-                response = client.chat.send(
+                response = client.chat.completions.create(
                     model=modelo_ai,
                     messages=[{"role": "user", "content": prompt_text}],
-                    max_tokens=max_tokens,
-                    timeout_ms=25000  # 25 seconds timeout to prevent freezing
+                    max_tokens=max_tokens
                 )
                 
                 # Check response format
